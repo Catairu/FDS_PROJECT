@@ -1,5 +1,5 @@
 import hydra
-from omegaconf import DictConfig # Sono gli oggetti di configurazione di Hydra, consentono di accedere ai parametri definiti nei file YAML. 
+from omegaconf import DictConfig  
 import lightning as lit
 from net.base import Net
 from torchvision import datasets, transforms
@@ -27,20 +27,27 @@ def main(cfg: DictConfig):
             monitor="val_acc",
             patience=5,
             verbose=True,
-            mode="max", min_delta=1e-2
-        )], **cfg.trainer)
+            mode="max", min_delta=1e-3
+        ), cb.ModelCheckpoint(
+            monitor="val_acc",
+             mode="max", 
+             save_top_k=1, 
+            filename="{epoch}-{val_acc:.4f}"),], 
+             **cfg.trainer)
 
     print('Training...')
     trainer.fit(model, train_loader, val_loader)
     
     print('Testing...')
-    trainer.test(model, test_loader)
+    best_model_path = trainer.checkpoint_callback.best_model_path
+    best_model = Net.load_from_checkpoint(best_model_path, cfg=cfg.net)
+    trainer.test(best_model, test_loader)
     
     hyperparams_dict = OmegaConf.to_container(cfg, resolve=True)
-    hyperparams_dict["info"] = {  # type: ignore
+    hyperparams_dict["info"] = {  
         "num_params": get_num_params(model),
     }
-    wandb_logger.log_hyperparams(hyperparams_dict)  # type: ignore
+    wandb_logger.log_hyperparams(hyperparams_dict)  
 
 def get_num_params(module):
     """

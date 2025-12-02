@@ -13,30 +13,3 @@ class ConvBlock(nn.Module):
         x = self.pool(x)
         return x
 
-class DeconvBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size=2, stride=2, **_):
-        super(DeconvBlock, self).__init__()
-        self.deconv = nn.ConvTranspose1d(
-            in_channels, 
-            out_channels, 
-            kernel_size=kernel_size, 
-            stride=stride,
-            padding=0 
-        )
-        self.relu = nn.ReLU()
-
-    def forward(self, x):
-        x = self.deconv(x)
-        x = self.relu(x)
-        return x
-
-class FeedForwardBlock(nn.Module):
-    def __init__(self, input_dim, output_dim):
-        super(FeedForwardBlock, self).__init__()
-        self.fc = nn.Linear(input_dim, output_dim)
-        self.relu = nn.ReLU()
-
-    def forward(self, x):
-        x = self.fc(x)
-        x = self.relu(x)
-        return x
