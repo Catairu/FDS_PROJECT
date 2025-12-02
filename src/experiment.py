@@ -30,7 +30,7 @@ def main(cfg: DictConfig):
         save_top_k=1,
         filename="convAE-{epoch:02d}-{val_loss:.4f}"
     )
-    ae_earlystop = EarlyStopping(monitor="val_loss", patience=5, mode="min")
+    ae_earlystop = EarlyStopping(monitor="val_loss", patience=15, mode="min")
 
     ae_trainer = Trainer(
         logger=wandb_logger,
@@ -52,16 +52,16 @@ def main(cfg: DictConfig):
         save_top_k=1,
         filename="LSTM-{epoch:02d}-{val_acc:.4f}"
     )
-    lstm_earlystop = EarlyStopping(monitor="val_acc", patience=5, mode="max")
+    lstm_earlystop = EarlyStopping(monitor="val_acc", patience=15, mode="max")
 
     lstm_trainer = Trainer(
-        patience=15,
         logger=wandb_logger,
         callbacks=[lstm_checkpoint, lstm_earlystop],
         **cfg.trainer
     )
 
     lstm_trainer.fit(lstm_model, train_loader, val_loader)
+    best_lstm_path = lstm_checkpoint.best_model_path
     best_lstm_model = LSTMClassifier.load_from_checkpoint(best_lstm_path, pretrained_encoder=pretrained_encoder, cfg=cfg.net)
     lstm_trainer.test(best_lstm_model, test_loader)
     
