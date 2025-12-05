@@ -7,39 +7,64 @@ metric:
   goal: maximize
 
 parameters:
-  trainer.max_epochs:
-      distribution: int_uniform
-      min: 50
-      max: 200
+    trainer.max_epochs:
+        distribution: int_uniform
+        min: 50
+        max: 200
 
-  dataset.batch_size:
-      values: [16, 32, 64, 128, 192]
+    dataset.batch_size:
+        values: [16, 32, 64, 128, 192]
 
-  dataset.val_split:
-      distribution: uniform
-      min: 0.1
-      max: 0.3
-  net.depth:
-      values: [2, 3, 4, 5]
+    dataset.val_split:
+        distribution: uniform
+        min: 0.1
+        max: 0.3
 
-  net.width:
-      values: [32, 64, 128, 256]
+    net.depth:
+        values: [2, 3, 4, 5]
+
+    net.width:
+        values: [32, 64, 128, 256]
+        
+    net.optimizer._target_:
+        values:
+            - torch.optim.Adam
+            - torch.optim.SGD
+
+    net.optimizer.lr:
+        distribution: uniform
+        min: 0.0001
+        max: 0.001
+
+    net.rnn_block.hidden_size:
+        values: [64, 128, 256, 512]
+
+    net.rnn_block.num_layers:
+        values: [1, 2, 3]
+
+    net.block.dropout:
+        distribution: uniform
+        min: 0.3
+        max: 0.7
+
+    net.block.pool_size:
+        values: [2, 3, 4]
+        
+    net.block.kernel_size:
+        values: [3, 5, 7]
     
-  net.optimizer._target_:
-      values:
-        - torch.optim.Adam
-        - torch.optim.SGD
-
-  net.optimizer.lr:
-      distribution: uniform
-      min: 0.0001
-      max: 0.001
-
-  net.rnn_block.hidden_size:
-      values: [64, 128, 256, 512]
-
-  net.rnn_block.num_layers:
-      values: [1, 2, 3]
+    net.embed.dropout:
+        distribution: uniform
+        min: 0.1
+        max: 0.5
+    
+    net.embed.kernel_size:
+        values: [3, 5]
+    
+    net.embed.pool_size:
+        values: [1, 2]
+        
+        
 
 
 

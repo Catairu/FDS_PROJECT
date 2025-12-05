@@ -21,4 +21,4 @@ dataset:
 wandb :
   project: "FDS_PROJECT"
   entity: "catairu-sapienza-universit-di-roma"
-  name: "ep${trainer.max_epochs}_bs${dataset.batch_size}_lr${net.optimizer.lr}_d${net.depth}_w${net.width}_h${net.rnn_block.hidden_size}_l${net.rnn_block.num_layers}_${net.optimizer._target_}_lr${net.optimizer.lr}"
+  name: "maxepochs${trainer.max_epochs}_bs${dataset.batch_size}_valsplit${dataset.val_split}_depth${net.depth}_width${net.width}_opt${net.optimizer._target_}_lr${net.optimizer.lr}_hsize${net.rnn_block.hidden_size}_nlayers${net.rnn_block.num_layers}"
