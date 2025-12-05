@@ -3,3 +3,4 @@ in_channels: 9
 out_channels: ${net.width}
 kernel_size: 3
 pool_size: 1
+dropout: 0.1

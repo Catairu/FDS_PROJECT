@@ -21,10 +21,10 @@ parameters:
         max: 0.3
 
     net.depth:
-        values: [2, 3, 4, 5]
+        values: [2, 3, 4]
 
     net.width:
-        values: [32, 64, 128, 256]
+        values: [32, 64, 128]
         
     net.optimizer._target_:
         values:
@@ -37,10 +37,10 @@ parameters:
         max: 0.001
 
     net.rnn_block.hidden_size:
-        values: [64, 128, 256, 512]
+        values: [64, 128, 256]
 
     net.rnn_block.num_layers:
-        values: [1, 2, 3]
+        values: [1, 2]
 
     net.block.dropout:
         distribution: uniform
@@ -48,7 +48,7 @@ parameters:
         max: 0.7
 
     net.block.pool_size:
-        values: [2, 3, 4]
+        values: [2, 3]
         
     net.block.kernel_size:
         values: [3, 5, 7]
