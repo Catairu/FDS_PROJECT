@@ -1,7 +1,7 @@
 defaults:
  - /block: conv
  - /embed: conv
- - /unembed: lazy_linear
+ - /unembed: mlp
  - /optimizer: adam
  - /rnn_block: lstm
 

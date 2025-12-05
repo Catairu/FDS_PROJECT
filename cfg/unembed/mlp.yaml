@@ -1,0 +1,6 @@
+_target_: net.mlp.MLPBlockLazy
+hidden_sizes:
+  - 128
+  - 64
+output_size: ${net.num_classes}
+dropout: 0.5

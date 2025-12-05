@@ -32,7 +32,7 @@ class Net(lit.LightningModule):
         x = self.features(x) 
         x = x.permute(0, 2, 1) 
         x = self.lstm_block(x)
-        x = x.view(x.size(0), -1)
+        x = x.mean(dim=1)
         x = self.unembed(x) 
         return x
 
