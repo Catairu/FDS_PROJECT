@@ -4,7 +4,7 @@ from torchmetrics import Accuracy
 
 import torch.nn as nn
 import torch.nn.functional as F
-
+import wandb
 from sklearn.metrics import classification_report
 from hydra.utils import instantiate
 
@@ -73,13 +73,19 @@ class Net(lit.LightningModule):
         return optimizer
 
     def on_test_epoch_end(self):
-        preds = torch.cat(self.test_preds).cpu()
-        labels = torch.cat(self.test_labels).cpu()
-
-        report = classification_report(
-            labels,
-            preds,
-            target_names=self.class_names,
-            digits=4,
-        )
-        print("\nTest Classification Report:\n", report)
+        all_preds = torch.cat(self.test_preds)
+        all_labels = torch.cat(self.test_labels)
+        
+        if isinstance(self.logger, lit.pytorch.loggers.WandbLogger):
+            self.logger.experiment.log({
+                "confusion_matrix_interactive": wandb.plot.confusion_matrix(
+                    probs=None,
+                    y_true=all_labels.flatten().tolist(),  
+                    preds=all_preds.flatten().tolist(),    
+                    class_names=self.class_names,
+                    title="Confusion Matrix Final"
+                )
+            })
+            
+        self.test_preds.clear()
+        self.test_labels.clear()

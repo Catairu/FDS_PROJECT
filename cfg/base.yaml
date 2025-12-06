@@ -12,8 +12,8 @@ net:
 trainer:
   max_epochs: 100
   log_every_n_steps: 10
-  accelerator: "gpu"
-  devices: [0]
+  #accelerator: "gpu"
+  #devices: [0]
 
 k_folds: 5
 
