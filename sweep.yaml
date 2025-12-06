@@ -10,7 +10,7 @@ parameters:
     trainer.max_epochs:
         distribution: int_uniform
         min: 50
-        max: 200
+        max: 100
 
     dataset.batch_size:
         values: [16, 32, 64, 128, 192]
@@ -29,7 +29,6 @@ parameters:
     net.optimizer._target_:
         values:
             - torch.optim.Adam
-            - torch.optim.SGD
 
     net.optimizer.lr:
         distribution: uniform

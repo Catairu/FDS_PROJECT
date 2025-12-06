@@ -22,12 +22,13 @@ DATASETS = {
         "url": "https://drive.google.com/uc?id=1C0VS_9J2V-7-5UoBaKgdqiUQv7R8qHYo",
         "sentinel": DATA_DIR / "WISDM",
         "zip_name": "wisdm.zip",
-    }
+    },
 }
 
 # ==============================================================================
 # 2. DOWNLOAD FUNCTION
 # ==============================================================================
+
 
 def download_and_extract(name: str, info: dict):
     sentinel = info["sentinel"]
@@ -54,6 +55,7 @@ def download_and_extract(name: str, info: dict):
 # ==============================================================================
 # 3. SELECT DATASETS TO DOWNLOAD
 # ==============================================================================
+
 
 def setup(datasets_to_download=None):
     """
@@ -83,4 +85,3 @@ if __name__ == "__main__":
     # setup(["uci_har", "wisdm"])
     # setup()  # download ALL
     setup()
-

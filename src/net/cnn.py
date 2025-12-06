@@ -1,9 +1,14 @@
 import torch.nn as nn
 
+
 class ConvBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size=3, pool_size=2, dropout=0.5):
+    def __init__(
+        self, in_channels, out_channels, kernel_size=3, pool_size=2, dropout=0.5
+    ):
         super(ConvBlock, self).__init__()
-        self.conv = nn.Conv1d(in_channels, out_channels, kernel_size=kernel_size, padding= kernel_size//2)
+        self.conv = nn.Conv1d(
+            in_channels, out_channels, kernel_size=kernel_size, padding=kernel_size // 2
+        )
         self.bn = nn.BatchNorm1d(out_channels)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(dropout)
@@ -16,4 +21,3 @@ class ConvBlock(nn.Module):
         x = self.dropout(x)
         x = self.pool(x)
         return x
-

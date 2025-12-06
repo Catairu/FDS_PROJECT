@@ -10,12 +10,16 @@ net:
   num_classes: 6
 
 trainer:
-  max_epochs: 200
+  max_epochs: 100
   log_every_n_steps: 10
+  accelerator: "gpu"
+  devices: [0]
+
+k_folds: 5
 
 dataset:
   data_dir: "./data"
-  batch_size: 32
+  batch_size: 16
   val_split: 0.2
 
 wandb :
