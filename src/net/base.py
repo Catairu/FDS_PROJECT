@@ -5,6 +5,7 @@ from torchmetrics import Accuracy
 import torch.nn as nn
 import torch.nn.functional as F
 
+from sklearn.metrics import classification_report
 from hydra.utils import instantiate
 
 from net.cnn import ConvBlock
@@ -27,6 +28,12 @@ class Net(lit.LightningModule):
         self.train_acc = Accuracy(task="multiclass", num_classes=cfg.num_classes)
         self.val_acc = Accuracy(task="multiclass", num_classes=cfg.num_classes)
         self.test_acc = Accuracy(task="multiclass", num_classes=cfg.num_classes)
+        self.class_names = [
+            "Walking", "Upstairs", "Downstairs", 
+            "Sitting", "Standing", "Laying"
+        ]
+        self.test_preds = []
+        self.test_labels = []
 
     def forward(self, x):
         x = self.embed(x)
@@ -58,7 +65,21 @@ class Net(lit.LightningModule):
         loss = F.cross_entropy(y_hat, y)
         self.log("test_loss", loss)
         self.log("test_acc", self.test_acc(y_hat, y), prog_bar=True)
+        self.test_preds.append(torch.argmax(y_hat, dim=1))
+        self.test_labels.append(y)
 
     def configure_optimizers(self):
         optimizer = instantiate(self.cfg.optimizer, self.parameters())
         return optimizer
+
+    def on_test_epoch_end(self):
+        preds = torch.cat(self.test_preds).cpu()
+        labels = torch.cat(self.test_labels).cpu()
+
+        report = classification_report(
+            labels,
+            preds,
+            target_names=self.class_names,
+            digits=4,
+        )
+        print("\nTest Classification Report:\n", report)
