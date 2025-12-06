@@ -110,7 +110,7 @@ def main(cfg: DictConfig):
 
     wandb.config.update(
         {
-            "num_params": get_num_params(final_best),
+            "num_params": get_num_params(final_model),
         },
         allow_val_change=True,
     )
