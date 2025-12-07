@@ -1,6 +1,5 @@
 import torch.nn as nn
 
-
 class ConvBlock(nn.Module):
     def __init__(
         self, in_channels, out_channels, kernel_size=3, pool_size=2, dropout=0.5

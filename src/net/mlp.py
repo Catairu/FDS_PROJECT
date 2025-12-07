@@ -3,11 +3,6 @@ import torch.nn as nn
 
 
 class MLPBlockLazy(nn.Module):
-    """
-    MLP modulare con LazyLinear e LazyBatchNorm1d.
-    Adatto a collegare CNN+LSTM senza conoscere in_features.
-    """
-
     def __init__(self, hidden_sizes=[128, 64], output_size=6, dropout=0.5):
         super().__init__()
 

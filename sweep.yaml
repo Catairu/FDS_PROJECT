@@ -7,13 +7,16 @@ metric:
   goal: maximize
 
 parameters:
+    k_folds:
+        values: [5, 10]
+
     trainer.max_epochs:
         distribution: int_uniform
-        min: 50
-        max: 100
+        min: 40
+        max: 80
 
     dataset.batch_size:
-        values: [16, 32, 64, 128, 192]
+        values: [16, 32, 64, 128]
 
     dataset.val_split:
         distribution: uniform
@@ -29,14 +32,20 @@ parameters:
     net.optimizer._target_:
         values:
             - torch.optim.Adam
+            - torch.optim.AdamW
 
     net.optimizer.lr:
         distribution: uniform
         min: 0.0001
         max: 0.001
+    
+    net.optimizer.weight_decay:
+        distribution: uniform
+        min: 0
+        max: 0.01
 
     net.rnn_block.hidden_size:
-        values: [64, 128, 256]
+        values: [64, 128]
 
     net.rnn_block.num_layers:
         values: [1, 2]
@@ -64,8 +73,6 @@ parameters:
         values: [1, 2]
         
         
-
-
 
 command:
   - uv

@@ -15,8 +15,8 @@ class Net(lit.LightningModule):
     def __init__(self, cfg):
         super(Net, self).__init__()
         self.save_hyperparameters()
-        self.depth = cfg.depth
         self.cfg = cfg
+        self.depth = cfg.depth
 
         self.embed = instantiate(cfg.embed)
         self.features = nn.Sequential(
@@ -28,6 +28,7 @@ class Net(lit.LightningModule):
         self.train_acc = Accuracy(task="multiclass", num_classes=cfg.num_classes)
         self.val_acc = Accuracy(task="multiclass", num_classes=cfg.num_classes)
         self.test_acc = Accuracy(task="multiclass", num_classes=cfg.num_classes)
+        
         self.class_names = [
             "Walking", "Upstairs", "Downstairs", 
             "Sitting", "Standing", "Laying"

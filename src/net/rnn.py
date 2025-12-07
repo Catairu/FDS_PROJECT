@@ -3,12 +3,6 @@ import torch.nn as nn
 
 
 class LSTMBlock(nn.Module):
-    """
-    Blocco LSTM modulare.
-    Progettato per prendere in input sequenze e restituire l'output
-    dell'ultimo passo temporale, tipico per la classificazione/regressione.
-    """
-
     def __init__(
         self, input_size, hidden_size, num_layers=1, dropout=0.0, bidirectional=False
     ):
