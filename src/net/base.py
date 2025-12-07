@@ -17,7 +17,6 @@ class Net(lit.LightningModule):
         self.save_hyperparameters()
         self.cfg = cfg
         self.depth = cfg.depth
-        self.pos_embedding = nn.Parameter(torch.randn(1, 32, cfg.width))
 
         self.embed = instantiate(cfg.embed)
         self.features = nn.Sequential(
@@ -31,6 +30,14 @@ class Net(lit.LightningModule):
             activation='relu',
             batch_first=True          
         )
+        dummy_input = torch.zeros(1, 9, 128) 
+        with torch.no_grad():
+            dummy_out = self.embed(dummy_input)
+            dummy_out = self.features(dummy_out)
+        
+        self.reduced_time_dim = dummy_out.shape[2] 
+        
+        self.pos_embedding = nn.Parameter(torch.randn(1, self.reduced_time_dim, cfg.width))
         self.transformer_block = nn.TransformerEncoder(encoder_layer, num_layers=2)
         #self.lstm_block = instantiate(cfg.rnn_block)
         self.unembed = instantiate(cfg.unembed)
