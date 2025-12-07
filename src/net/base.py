@@ -17,12 +17,22 @@ class Net(lit.LightningModule):
         self.save_hyperparameters()
         self.cfg = cfg
         self.depth = cfg.depth
+        self.pos_embedding = nn.Parameter(torch.randn(1, 32, cfg.width))
 
         self.embed = instantiate(cfg.embed)
         self.features = nn.Sequential(
             *[instantiate(cfg.block) for _ in range(self.depth - 1)]
         )
-        self.lstm_block = instantiate(cfg.rnn_block)
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=cfg.width,        
+            nhead=4,                 
+            dim_feedforward=cfg.width * 4, 
+            dropout=0.1,
+            activation='relu',
+            batch_first=True          
+        )
+        self.transformer_block = nn.TransformerEncoder(encoder_layer, num_layers=2)
+        #self.lstm_block = instantiate(cfg.rnn_block)
         self.unembed = instantiate(cfg.unembed)
 
         self.train_acc = Accuracy(task="multiclass", num_classes=cfg.num_classes)
@@ -40,8 +50,12 @@ class Net(lit.LightningModule):
         x = self.embed(x)
         x = self.features(x)
         x = x.permute(0, 2, 1)
-        x = self.lstm_block(x)
-        x = x.view(x.size(0), -1)
+        x += self.pos_embedding
+        x = self.transformer_block(x)
+        
+        x = x.mean(dim=1)
+        #x = self.lstm_block(x)
+        #x = x.view(x.size(0), -1)
         x = self.unembed(x)
         return x
 

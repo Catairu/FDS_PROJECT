@@ -43,12 +43,12 @@ parameters:
         distribution: uniform
         min: 0
         max: 0.01
+    
+    #net.rnn_block.hidden_size:
+    #    values: [64, 128]
 
-    net.rnn_block.hidden_size:
-        values: [64, 128]
-
-    net.rnn_block.num_layers:
-        values: [1, 2]
+    #net.rnn_block.num_layers:
+     #   values: [1, 2]
 
     net.block.dropout:
         distribution: uniform
