@@ -7,7 +7,7 @@ import torch.nn.functional as F
 import wandb
 from sklearn.metrics import classification_report
 from hydra.utils import instantiate
-
+from net.tcn import TCN
 from net.cnn import ConvBlock
 
 
@@ -22,6 +22,14 @@ class Net(lit.LightningModule):
         self.features = nn.Sequential(
             *[instantiate(cfg.block) for _ in range(self.depth - 1)]
         )
+        #self.lstm_block = instantiate(cfg.rnn_block)
+        self.tcn_block = TCN(
+            input_channels=cfg.width,
+            channels=[cfg.width, cfg.width, cfg.width, cfg.width], 
+            kernel_size=3,
+            dropout=0.3
+        )
+        
         encoder_layer = nn.TransformerEncoderLayer(
             d_model=cfg.width,        
             nhead=4,                 
@@ -39,7 +47,6 @@ class Net(lit.LightningModule):
         
         self.pos_embedding = nn.Parameter(torch.randn(1, self.reduced_time_dim, cfg.width))
         self.transformer_block = nn.TransformerEncoder(encoder_layer, num_layers=2)
-        #self.lstm_block = instantiate(cfg.rnn_block)
         self.unembed = instantiate(cfg.unembed)
 
         self.train_acc = Accuracy(task="multiclass", num_classes=cfg.num_classes)
@@ -56,13 +63,14 @@ class Net(lit.LightningModule):
     def forward(self, x):
         x = self.embed(x)
         x = self.features(x)
-        x = x.permute(0, 2, 1)
-        x += self.pos_embedding
-        x = self.transformer_block(x)
-        
+        ##x = x.permute(0, 2, 1)
+        ##x = self.lstm_block(x)
+        x = self.tcn_block(x)
+        x = x.permute(0, 2, 1) 
+        x = x + self.pos_embedding[:, :x.size(1), :]
+        x = self.transformer_block(x) 
         x = x.mean(dim=1)
-        #x = self.lstm_block(x)
-        #x = x.view(x.size(0), -1)
+        ##x = x.view(x.size(0), -1)
         x = self.unembed(x)
         return x
 

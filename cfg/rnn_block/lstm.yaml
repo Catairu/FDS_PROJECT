@@ -1,4 +1,4 @@
-_target_: net.rnn.LSTMBlock 
+_target_: net.lstm.LSTMBlock 
 
 input_size: ${net.width}
 hidden_size: 256

@@ -11,7 +11,7 @@ class ConvBlock(nn.Module):
         self.bn = nn.BatchNorm1d(out_channels)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(dropout)
-        self.pool = nn.MaxPool1d(kernel_size=pool_size, stride=2)
+        self.pool = nn.MaxPool1d(kernel_size=pool_size, stride=2) #95.55
 
     def forward(self, x):
         x = self.conv(x)
