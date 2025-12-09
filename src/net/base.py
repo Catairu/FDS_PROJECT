@@ -66,10 +66,7 @@ class Net(lit.LightningModule):
         ##x = x.permute(0, 2, 1)
         ##x = self.lstm_block(x)
         x = self.tcn_block(x)
-        x = x.permute(0, 2, 1) 
-        x = x + self.pos_embedding[:, :x.size(1), :]
-        x = self.transformer_block(x) 
-        x = x.mean(dim=1)
+        x = x.mean(dim=-1)
         ##x = x.view(x.size(0), -1)
         x = self.unembed(x)
         return x

@@ -98,19 +98,25 @@ class TCN(nn.Module):
 # ============================================================
 
 class TCNClassifier(nn.Module):
-    def __init__(self, num_classes=6, cnn_output_channels=64):
+    def __init__(self, num_classes=6):
         super().__init__()
 
         self.tcn = TCN(
-            input_channels=cnn_output_channels, 
-            channels=[64, 64, 128, 128],        
-            kernel_size=3,                     
+            input_channels=64,
+            channels=[64, 64, 128, 128, 128, 128],  # 6 layers
+            kernel_size=5,
             dropout=0.3
         )
 
         self.fc = nn.Linear(128, num_classes)
 
     def forward(self, x):
-        out = self.tcn(x)       
-        out = out.mean(dim=-1) 
+        # x = [batch, time, channels]
+        x = x.transpose(1, 2)   # -> [batch, channels, time]
+
+        out = self.tcn(x)       # -> [batch, 128, time]
+
+        out = out.mean(dim=-1)  # global average pooling
+
         return self.fc(out)
+

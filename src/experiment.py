@@ -8,7 +8,7 @@ from sklearn.model_selection import GroupKFold
 import numpy as np
 import wandb
 from lightning.pytorch.loggers import WandbLogger
-from dataset.loaders import load_har, load_wisdm
+from dataset.loaders import load_har
 
 import lightning.pytorch.callbacks as cb
 import os
