@@ -21,32 +21,32 @@ class Net(lit.LightningModule):
         self.embed = instantiate(cfg.embed)
         self.features = nn.Sequential(
             *[instantiate(cfg.block) for _ in range(self.depth - 1)]
-        )
-        #self.lstm_block = instantiate(cfg.rnn_block)
-        self.tcn_block = TCN(
-            input_channels=cfg.width,
-            channels=[cfg.width, cfg.width, cfg.width, cfg.width], 
-            kernel_size=3,
-            dropout=0.3
-        )
+         )
+        self.lstm_block = instantiate(cfg.rnn_block)
+        # self.tcn_block = TCN(
+        #     input_channels=cfg.width,
+        #     channels=[cfg.width, cfg.width, cfg.width, cfg.width], 
+        #     kernel_size=3,
+        #     dropout=0.3
+        # )
         
-        encoder_layer = nn.TransformerEncoderLayer(
-            d_model=cfg.width,        
-            nhead=4,                 
-            dim_feedforward=cfg.width * 4, 
-            dropout=0.1,
-            activation='relu',
-            batch_first=True          
-        )
-        dummy_input = torch.zeros(1, 9, 128) 
-        with torch.no_grad():
-            dummy_out = self.embed(dummy_input)
-            dummy_out = self.features(dummy_out)
+        # encoder_layer = nn.TransformerEncoderLayer(
+        #     d_model=cfg.width,        
+        #     nhead=4,                 
+        #     dim_feedforward=cfg.width * 4, 
+        #     dropout=0.1,
+        #     activation='relu',
+        #     batch_first=True          
+        # )
+        # dummy_input = torch.zeros(1, 9, 128) 
+        # with torch.no_grad():
+        #     dummy_out = self.embed(dummy_input)
+        #     dummy_out = self.features(dummy_out)
         
-        self.reduced_time_dim = dummy_out.shape[2] 
+        # self.reduced_time_dim = dummy_out.shape[2] 
         
-        self.pos_embedding = nn.Parameter(torch.randn(1, self.reduced_time_dim, cfg.width))
-        self.transformer_block = nn.TransformerEncoder(encoder_layer, num_layers=2)
+        # self.pos_embedding = nn.Parameter(torch.randn(1, self.reduced_time_dim, cfg.width))
+        # self.transformer_block = nn.TransformerEncoder(encoder_layer, num_layers=1)
         self.unembed = instantiate(cfg.unembed)
 
         self.train_acc = Accuracy(task="multiclass", num_classes=cfg.num_classes)
@@ -61,14 +61,19 @@ class Net(lit.LightningModule):
         self.test_labels = []
 
     def forward(self, x):
+        print(x.shape)
         x = self.embed(x)
+        print(x.shape)
         x = self.features(x)
-        ##x = x.permute(0, 2, 1)
-        ##x = self.lstm_block(x)
-        x = self.tcn_block(x)
-        x = x.mean(dim=-1)
-        ##x = x.view(x.size(0), -1)
+        print(x.shape)
+        x = x.permute(0, 2, 1)
+        print(x.shape)
+        x = self.lstm_block(x)
+        print(x.shape)
+        #x = self.tcn_block(x)
+        #x = x.mean(dim=-1)
         x = self.unembed(x)
+        print(x.shape)
         return x
 
     def training_step(self, batch, batch_idx):
