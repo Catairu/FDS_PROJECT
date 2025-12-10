@@ -61,19 +61,13 @@ class Net(lit.LightningModule):
         self.test_labels = []
 
     def forward(self, x):
-        print(x.shape)
         x = self.embed(x)
-        print(x.shape)
         x = self.features(x)
-        print(x.shape)
         x = x.permute(0, 2, 1)
-        print(x.shape)
         x = self.lstm_block(x)
-        print(x.shape)
         #x = self.tcn_block(x)
         #x = x.mean(dim=-1)
         x = self.unembed(x)
-        print(x.shape)
         return x
 
     def training_step(self, batch, batch_idx):
