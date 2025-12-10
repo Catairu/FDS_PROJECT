@@ -8,7 +8,7 @@ from sklearn.model_selection import GroupKFold
 import numpy as np
 import wandb
 from lightning.pytorch.loggers import WandbLogger
-from dataset.loaders import load_har
+from dataset.loaders import load_har, load_har_features
 
 import lightning.pytorch.callbacks as cb
 import os
@@ -29,7 +29,7 @@ def main(cfg: DictConfig):
     hyperparams_dict = OmegaConf.to_container(cfg, resolve=True)
     wandb_logger.log_hyperparams(hyperparams_dict)
 
-    train_dataset, test_loader = load_har(**cfg.dataset, load_all=True)
+    train_dataset, test_loader = load_har_features(**cfg.dataset, load_all=True)
 
     # k = cfg.k_folds
     # groups = train_dataset.subject_ids.numpy()

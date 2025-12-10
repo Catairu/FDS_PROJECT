@@ -6,5 +6,5 @@ hidden_size: 256
 num_layers: 2
 dropout: 0.1
 
-use_layer_norm: True
+use_layer_norm: False
 bidirectional: False

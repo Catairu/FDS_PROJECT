@@ -138,6 +138,13 @@ class HarFeatureDataset(Dataset):
         y = np.loadtxt(labels_file).astype(int).squeeze() - 1  
         return torch.tensor(y, dtype=torch.long)
 
+    def load_subjects(self):
+        subjects_file = (
+            self.data_dir / f"UCI HAR Dataset/{self.split}/subject_{self.split}.txt"
+        )
+        subjects = np.loadtxt(subjects_file).astype(int).squeeze()
+        return torch.tensor(subjects, dtype=torch.long)
+
     def __len__(self):
         return len(self.y)
 

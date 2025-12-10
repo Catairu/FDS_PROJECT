@@ -44,11 +44,11 @@ parameters:
         min: 0
         max: 0.01
     
-    #net.rnn_block.hidden_size:
-    #    values: [64, 128]
+    net.rnn_block.hidden_size:
+        values: [64, 128, 256]
 
-    #net.rnn_block.num_layers:
-     #   values: [1, 2]
+    net.rnn_block.num_layers:
+        values: [1, 2, 3]
 
     net.block.dropout:
         distribution: uniform
@@ -67,7 +67,7 @@ parameters:
         max: 0.5
     
     net.embed.kernel_size:
-        values: [3, 5]
+        values: [3, 5, 7]
     
     net.embed.pool_size:
         values: [1, 2]

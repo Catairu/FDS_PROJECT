@@ -5,7 +5,7 @@ defaults:
 seed: 42
 
 net:
-  depth: 2
+  depth: 3
   width: 128
   num_classes: 6
 

@@ -61,6 +61,7 @@ class Net(lit.LightningModule):
         self.test_labels = []
 
     def forward(self, x):
+        x = x.unsqueeze(1)
         x = self.embed(x)
         x = self.features(x)
         x = x.permute(0, 2, 1)
