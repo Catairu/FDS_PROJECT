@@ -29,7 +29,7 @@ def main(cfg: DictConfig):
     hyperparams_dict = OmegaConf.to_container(cfg, resolve=True)
     wandb_logger.log_hyperparams(hyperparams_dict)
 
-    train_dataset, test_loader = load_har_features(**cfg.dataset, load_all=True)
+    train_dataset, test_loader = load_har(**cfg.dataset, load_all=True)
 
     # k = cfg.k_folds
     # groups = train_dataset.subject_ids.numpy()
