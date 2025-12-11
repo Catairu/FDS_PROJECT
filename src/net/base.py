@@ -22,13 +22,13 @@ class Net(lit.LightningModule):
         self.features = nn.Sequential(
             *[instantiate(cfg.block) for _ in range(self.depth - 1)]
          )
-        self.lstm_block = instantiate(cfg.rnn_block)
-        # self.tcn_block = TCN(
-        #     input_channels=cfg.width,
-        #     channels=[cfg.width, cfg.width, cfg.width, cfg.width], 
-        #     kernel_size=3,
-        #     dropout=0.3
-        # )
+        #self.lstm_block = instantiate(cfg.rnn_block)
+        self.tcn_block = TCN(
+             input_channels=cfg.width,
+             channels=[cfg.width, cfg.width, cfg.width, cfg.width], 
+             kernel_size=3,
+             dropout=0.3
+        )
         
         # encoder_layer = nn.TransformerEncoderLayer(
         #     d_model=cfg.width,        
@@ -64,10 +64,9 @@ class Net(lit.LightningModule):
         x = x.unsqueeze(1)
         x = self.embed(x)
         x = self.features(x)
-        x = x.permute(0, 2, 1)
-        x = self.lstm_block(x)
-        #x = self.tcn_block(x)
-        #x = x.mean(dim=-1)
+        #x = self.lstm_block(x)
+        x = self.tcn_block(x)
+        x = x.mean(dim=2)
         x = self.unembed(x)
         return x
 
