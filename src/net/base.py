@@ -19,9 +19,9 @@ class Net(lit.LightningModule):
         self.depth = cfg.depth
 
         self.embed = instantiate(cfg.embed)
-        self.features = nn.Sequential(
-            *[instantiate(cfg.block) for _ in range(self.depth - 1)]
-         )
+        #self.features = nn.Sequential(
+        #    *[instantiate(cfg.block) for _ in range(self.depth - 1)]
+        # )
         self.lstm_block = instantiate(cfg.rnn_block)
         # self.tcn_block = TCN(
         #      input_channels=cfg.width,
@@ -62,7 +62,7 @@ class Net(lit.LightningModule):
 
     def forward(self, x):
         x = self.embed(x)
-        x = self.features(x)
+        #x = self.features(x)
         x = x.permute(0, 2, 1) 
         x = self.lstm_block(x)
         #x = self.tcn_block(x)

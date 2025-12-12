@@ -1,10 +1,10 @@
 _target_: net.lstm.LSTMBlock 
 
 input_size: ${net.width}
-hidden_size: 256
+hidden_size: 64
 
 num_layers: 2
-dropout: 0.1
+dropout: 0.6
 
 use_layer_norm: False
-bidirectional: False
+bidirectional: True

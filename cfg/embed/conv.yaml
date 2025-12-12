@@ -2,5 +2,5 @@ _target_: net.cnn.ConvBlock
 in_channels: 9
 out_channels: ${net.width}
 kernel_size: 5
-pool_size: 1
-dropout: 0.4
+pool_size: 2
+dropout: 0
