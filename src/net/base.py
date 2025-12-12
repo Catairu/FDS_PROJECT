@@ -61,18 +61,11 @@ class Net(lit.LightningModule):
         self.test_labels = []
 
     def forward(self, x):
-        #x = x.unsqueeze(1)
-        total_acc = x[:,-3:,:]
-        grav_mean = torch.mean(total_acc, dim=2)
-        grav_std = torch.std(total_acc, dim=2)
-        stats_features = torch.cat((grav_mean, grav_std), dim=1)
         x = self.embed(x)
         x = self.features(x)
         x = x.permute(0, 2, 1) 
         x = self.lstm_block(x)
-
         #x = self.tcn_block(x)
-        x = torch.cat((x, stats_features), dim=1)
         x = self.unembed(x)
         return x
 
