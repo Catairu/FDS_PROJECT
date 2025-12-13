@@ -36,30 +36,19 @@ class Net(lit.LightningModule):
         self.test_preds = []
         self.test_labels = []
 
-        # per salvare feature map CNN nel test
-        self.cnn_features_example = None
 
 
-    # -------------------------------------------------
-    #                   FORWARD
-    # -------------------------------------------------
     def forward(self, x, return_cnn_features=False):
         x = self.embed(x)
         x = self.features(x)
-
-        cnn_features = x.clone()     # <---- FEATURE MAP CNN
 
         x = x.permute(0, 2, 1)
         lstm_out = self.lstm_block(x)
         logits = self.unembed(lstm_out)
 
-        if return_cnn_features:
-            return logits, cnn_features
-
         return logits
 
 
-    # -------------------------------------------------
     def training_step(self, batch, batch_idx):
         x, y = batch
         y_hat = self(x)
@@ -82,7 +71,7 @@ class Net(lit.LightningModule):
     # -------------------------------------------------
     def test_step(self, batch, batch_idx):
         x, y = batch
-        y_hat, cnn_features = self(x, return_cnn_features=True)
+        y_hat = self(x)
 
         loss = F.cross_entropy(y_hat, y)
         self.log("test_loss", loss)
@@ -91,40 +80,13 @@ class Net(lit.LightningModule):
         self.test_preds.append(torch.argmax(y_hat, dim=1))
         self.test_labels.append(y)
 
-        # salva solo il primo batch
-        if batch_idx == 0:
-            self.cnn_features_example = cnn_features.detach().cpu()
 
 
-    # -------------------------------------------------
     def configure_optimizers(self):
         optimizer = instantiate(self.cfg.optimizer, self.parameters())
         return optimizer
 
-
-    # -------------------------------------------------
-    #          PLOT FEATURE MAP CNN + CONF MATRIX
-    # -------------------------------------------------
     def on_test_epoch_end(self):
-        import matplotlib.pyplot as plt
-
-        if self.cnn_features_example is not None:
-            # shape: [B, C, T]
-            feat = self.cnn_features_example[0]  # prende primo sample
-
-            plt.figure(figsize=(12, 5))
-            plt.imshow(feat, aspect='auto', origin='lower')
-            plt.colorbar()
-            plt.title("CNN Feature Map (after embed + features)")
-            plt.xlabel("Time")
-            plt.ylabel("Channels")
-
-            if isinstance(self.logger, lit.pytorch.loggers.WandbLogger):
-                self.logger.experiment.log({
-                    "cnn_feature_map": wandb.Image(plt)
-                })
-            plt.close()
-
         all_preds = torch.cat(self.test_preds)
         all_labels = torch.cat(self.test_labels)
 
