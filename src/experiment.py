@@ -31,66 +31,65 @@ def main(cfg: DictConfig):
 
     train_dataset, test_loader = load_har(**cfg.dataset, load_all=True)
 
-    # k = cfg.k_folds
-    # groups = train_dataset.subject_ids.numpy()
-    # gkf = GroupKFold(n_splits=k)
-    # fold_accs = []
-    # dummy_X = np.zeros(len(train_dataset))
+    k = cfg.k_folds
+    groups = train_dataset.subject_ids.numpy()
+    gkf = GroupKFold(n_splits=k)
+    fold_accs = []
+    dummy_X = np.zeros(len(train_dataset))
 
-    # for fold, (train_idx, val_idx) in enumerate(
-    #     gkf.split(X=dummy_X, y=None, groups=groups)
-    # ):
-    #     print(f"Starting Fold {fold+1}/{k}")
+    for fold, (train_idx, val_idx) in enumerate(
+        gkf.split(X=dummy_X, y=None, groups=groups)
+    ):
+        print(f"Starting Fold {fold+1}/{k}")
 
-    #     train_ds = Subset(train_dataset, train_idx)
-    #     val_ds = Subset(train_dataset, val_idx)
+        train_ds = Subset(train_dataset, train_idx)
+        val_ds = Subset(train_dataset, val_idx)
 
-    #     train_loader = DataLoader(
-    #         train_ds, batch_size=cfg.dataset.batch_size, shuffle=True
-    #     )
-    #     val_loader = DataLoader(val_ds, batch_size=cfg.dataset.batch_size)
+        train_loader = DataLoader(
+            train_ds, batch_size=cfg.dataset.batch_size, shuffle=True
+        )
+        val_loader = DataLoader(val_ds, batch_size=cfg.dataset.batch_size)
 
-    #     model = Net(cfg.net)
+        model = Net(cfg.net)
 
-    #     callbacks = [
-    #         cb.EarlyStopping(monitor="val_loss", patience=8, verbose=True, mode="min"),
-    #         cb.ModelCheckpoint(
-    #             monitor="val_acc",
-    #             mode="max",
-    #             filename=f"fold{fold}-{{epoch}}-{{val_acc:.4f}}",
-    #             save_top_k=1,
-    #         ),
-    #     ]
+        callbacks = [
+            cb.EarlyStopping(monitor="val_loss", patience=8, verbose=True, mode="min"),
+            cb.ModelCheckpoint(
+                monitor="val_acc",
+                mode="max",
+                filename=f"fold{fold}-{{epoch}}-{{val_acc:.4f}}",
+                save_top_k=1,
+            ),
+        ]
 
-    #     trainer = lit.Trainer(logger=wandb_logger, callbacks=callbacks, **cfg.trainer)
+        trainer = lit.Trainer(logger=wandb_logger, callbacks=callbacks, **cfg.trainer)
+        trainer.fit(model, train_loader, val_loader)
 
-    #     trainer.fit(model, train_loader, val_loader)
+        best_ckpt = trainer.checkpoint_callback.best_model_path
+        best_model = Net.load_from_checkpoint(best_ckpt, cfg=cfg.net)
 
-    #     best_ckpt = trainer.checkpoint_callback.best_model_path
-    #     best_model = Net.load_from_checkpoint(best_ckpt, cfg=cfg.net)
+        val_metrics = trainer.validate(best_model, val_loader)[0]
+        fold_accs.append(val_metrics["val_acc"])
 
-    #     val_metrics = trainer.validate(best_model, val_loader)[0]
-    #     fold_accs.append(val_metrics["val_acc"])
+        wandb_logger.log_metrics(
+            {f"fold_{fold}_best_val_acc": val_metrics["val_acc"], "fold": fold}
+        )
 
-    #     wandb_logger.log_metrics(
-    #         {f"fold_{fold}_best_val_acc": val_metrics["val_acc"], "fold": fold}
-    #     )
+    avg_val_acc = np.mean(fold_accs)
+    std_val_acc = np.std(fold_accs)
 
-    # avg_val_acc = np.mean(fold_accs)
-    # std_val_acc = np.std(fold_accs)
+    print("\n============ K-FOLD FINISHED ============")
+    print(f"Average K-fold val_acc = {avg_val_acc:.4f} ± {std_val_acc:.4f}")
 
-    # print("\n============ K-FOLD FINISHED ============")
-    # print(f"Average K-fold val_acc = {avg_val_acc:.4f} ± {std_val_acc:.4f}")
+    wandb_logger.log_metrics(
+        {
+            "kfold_avg_val_acc": avg_val_acc,
+            "kfold_std_val_acc": std_val_acc,
+            "kfold_avg_std_string": f"{avg_val_acc:.4f} ± {std_val_acc:.4f}",
+        }
+    )
 
-    # wandb_logger.log_metrics(
-    #     {
-    #         "kfold_avg_val_acc": avg_val_acc,
-    #         "kfold_std_val_acc": std_val_acc,
-    #         "kfold_avg_std_string": f"{avg_val_acc:.4f} ± {std_val_acc:.4f}",
-    #     }
-    # )
-
-    # print("\n============ TRAINING FINAL MODEL ON FULL TRAIN ============")
+    print("\n============ TRAINING FINAL MODEL ON FULL TRAIN ============")
 
     final_model = Net(cfg.net)
 
